@@ -14,12 +14,7 @@ func GetAllBooks(c *gin.Context) {
 
 	configs.GetDB().Find(&Books)
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Books retrieved successfully",
-		"data":    Books,
-	})
-
+	c.JSON(http.StatusOK, Books)
 }
 
 func GetBookByID(c *gin.Context) {
@@ -29,17 +24,12 @@ func GetBookByID(c *gin.Context) {
 
 	if res.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"success": false,
 			"message": "Book not found",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "Book retrieved successfully",
-		"data":    book,
-	})
+	c.JSON(http.StatusOK, book)
 }
 
 func CreateBook(c *gin.Context) {
@@ -54,7 +44,6 @@ func CreateBook(c *gin.Context) {
 	err := validate.Struct(book)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"success": false,
 			"message": err.Error(),
 		})
 		return
@@ -62,11 +51,7 @@ func CreateBook(c *gin.Context) {
 
 	configs.GetDB().Create(&book)
 
-	c.JSON(http.StatusCreated, gin.H{
-		"success": true,
-		"message": "Book created successfully",
-		"data":    book,
-	})
+	c.JSON(http.StatusCreated, book)
 }
 
 func UpdateBook(c *gin.Context) {
@@ -76,7 +61,6 @@ func UpdateBook(c *gin.Context) {
 
 	if res.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"success": false,
 			"message": "Book not found",
 		})
 		return
@@ -91,7 +75,6 @@ func UpdateBook(c *gin.Context) {
 	err := validate.Struct(book)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"success": false,
 			"message": err.Error(),
 		})
 		return
@@ -100,9 +83,7 @@ func UpdateBook(c *gin.Context) {
 	configs.GetDB().Save(&book)
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
 		"message": "Book updated successfully",
-		"data":    book,
 	})
 }
 
@@ -113,7 +94,6 @@ func DeleteBook(c *gin.Context) {
 
 	if res.RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"success": false,
 			"message": "Book not found",
 		})
 		return
@@ -122,7 +102,6 @@ func DeleteBook(c *gin.Context) {
 	configs.GetDB().Delete(&book)
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
 		"message": "Book deleted successfully",
 	})
 }
