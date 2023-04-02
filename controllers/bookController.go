@@ -3,8 +3,10 @@ package controllers
 import (
 	"Challenge7/configs"
 	"Challenge7/models"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -12,7 +14,14 @@ var Books []models.Book
 
 func GetAllBooks(c *gin.Context) {
 
-	configs.GetDB().Find(&Books)
+	res := configs.GetDB().Find(&Books)
+
+	if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, Books)
 }
@@ -22,9 +31,14 @@ func GetBookByID(c *gin.Context) {
 	id := c.Param("id")
 	res := configs.GetDB().First(&book, id)
 
-	if res.RowsAffected == 0 {
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"message": "Book not found",
+		})
+		return
+	} else if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
 		})
 		return
 	}
@@ -49,7 +63,18 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
-	configs.GetDB().Create(&book)
+	res := configs.GetDB().Create(&book)
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Book not found",
+		})
+		return
+	} else if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
+		})
+		return
+	}
 
 	c.JSON(http.StatusCreated, book)
 }
@@ -59,9 +84,14 @@ func UpdateBook(c *gin.Context) {
 	id := c.Param("id")
 	res := configs.GetDB().First(&book, id)
 
-	if res.RowsAffected == 0 {
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"message": "Book not found",
+		})
+		return
+	} else if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
 		})
 		return
 	}
@@ -92,14 +122,25 @@ func DeleteBook(c *gin.Context) {
 	id := c.Param("id")
 	res := configs.GetDB().First(&book, id)
 
-	if res.RowsAffected == 0 {
+	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 			"message": "Book not found",
 		})
 		return
+	} else if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
+		})
+		return
 	}
 
-	configs.GetDB().Delete(&book)
+	res = configs.GetDB().Delete(&book)
+	if res.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Something went wrong, please try again later",
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Book deleted successfully",
