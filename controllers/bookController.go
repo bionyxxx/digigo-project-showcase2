@@ -18,7 +18,7 @@ func GetAllBooks(c *gin.Context) {
 
 	if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
@@ -38,7 +38,7 @@ func GetBookByID(c *gin.Context) {
 		return
 	} else if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
@@ -50,7 +50,9 @@ func CreateBook(c *gin.Context) {
 	var book models.Book
 
 	if err := c.ShouldBindJSON(&book); err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -71,7 +73,7 @@ func CreateBook(c *gin.Context) {
 		return
 	} else if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
@@ -91,13 +93,15 @@ func UpdateBook(c *gin.Context) {
 		return
 	} else if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
 
 	if err := c.ShouldBindJSON(&book); err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -129,7 +133,7 @@ func DeleteBook(c *gin.Context) {
 		return
 	} else if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
@@ -137,7 +141,7 @@ func DeleteBook(c *gin.Context) {
 	res = configs.GetDB().Delete(&book)
 	if res.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message": "Something went wrong, please try again later",
+			"message": res.Error.Error(),
 		})
 		return
 	}
