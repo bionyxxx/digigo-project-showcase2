@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	HOST     = "localhost"
-	PORT     = "5432"
+	HOST     = "containers-us-west-21.railway.app"
+	PORT     = "6898"
 	USER     = "postgres"
-	PASSWORD = "postgres"
-	DBNAME   = "challenge7"
+	PASSWORD = "bOtYAzKvvCtEcoENk4kT"
+	DBNAME   = "railway"
 	DB       *gorm.DB
 	err      error
 )
